@@ -79,7 +79,8 @@ router.get('/requests', authenticateToken, async (req, res) => {
 
 router.get('/prescriptions', authenticateToken, authorizeRole('medicine_company'), async (req, res) => {
   try {
-    const prescriptions = await MedicineRequest.find({ status: 'approved' })
+    const allowedStatuses = ['approved', 'processing', 'delivered'];
+    const prescriptions = await MedicineRequest.find({ status: { $in: allowedStatuses } })
       .sort({ updated_at: -1 })
       .populate('patient_id', 'full_name email phone')
       .populate('doctor_id', 'full_name email')
