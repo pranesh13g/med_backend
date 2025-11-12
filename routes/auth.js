@@ -23,6 +23,16 @@ router.post('/register', async (req, res) => {
       return res.status(409).json({ error: 'Email already exists' });
     }
 
+    // Check if doctor or medicine_company account already exists
+    if (role === 'doctor' || role === 'medicine_company') {
+      const existingRoleUser = await User.findOne({ role }).select('_id').lean();
+      if (existingRoleUser) {
+        return res.status(409).json({ 
+          error: `A ${role === 'doctor' ? 'doctor' : 'medicine company'} account already exists. Only one account is allowed.` 
+        });
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const userDoc = await User.create({
