@@ -17,7 +17,7 @@ const app = express();
 const httpServer = createServer(app);
 
 // Allow multiple frontends (local + production)
-const defaultOrigins = ['http://localhost:5173', 'http://localhost:3000', 'https://med-frontend-eta.vercel.app'];
+const defaultOrigins = ['http://localhost:5173', 'http://localhost:3000', 'https://med-backend-b0e1.onrender.com/api'];
 const envOrigins = [
   process.env.FRONTEND_URL,
   ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
