@@ -15,16 +15,32 @@ dotenv.config();
 
 const app = express();
 const httpServer = createServer(app);
+
+// Allow multiple frontends (local + production)
+const defaultOrigins = ['http://localhost:5173', 'http://localhost:3000', 'https://med-frontend-eta.vercel.app'];
+const envOrigins = [
+  process.env.FRONTEND_URL,
+  ...(process.env.FRONTEND_URLS ? process.env.FRONTEND_URLS.split(',') : []),
+].filter(Boolean);
+const allowedOrigins = [...new Set([...defaultOrigins, ...envOrigins])];
+
 const io = new Server(httpServer, {
-  cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
-    methods: ['GET', 'POST'],
-  },
+	cors: {
+		origin: allowedOrigins,
+		methods: ['GET', 'POST'],
+		credentials: true,
+	},
 });
 
 await connectDatabase();
 
-app.use(cors());
+app.set('trust proxy', 1);
+app.use(
+	cors({
+		origin: allowedOrigins,
+		credentials: true,
+	})
+);
 app.use(express.json());
 
 app.use('/api/auth', authRoutes);
